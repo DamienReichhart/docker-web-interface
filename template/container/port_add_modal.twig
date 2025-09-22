@@ -1,0 +1,10 @@
+<form id="addPortForm" action="/container/add/{{ server.urlIdentifierServer }}/{{ container.id }}/ports/post" method="post">
+    <div class="mb-3">
+        <label for="externalPort" class="form-label">Port externe</label>
+        <input type="text" class="form-control" id="externalPort" name="externalPort" required>
+    </div>
+    <div class="mb-3">
+        <label for="internalPort" class="form-label">Port interne</label>
+        <input type="text" class="form-control" id="internalPort" name="internalPort" required>
+    </div>
+</form> 

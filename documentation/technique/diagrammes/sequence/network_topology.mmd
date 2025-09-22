@@ -1,0 +1,42 @@
+sequenceDiagram
+    title Docker Container Network Topology
+    
+    participant User as External User
+    participant FrontNet as Frontend Network<br/>(192.168.10.0/24)
+    participant BackNet as Backend Network<br/>(192.168.20.0/24)
+    participant Apache as Apache<br/>(192.168.10.10 / 192.168.20.10)
+    participant PHP as PHP-FPM<br/>(192.168.20.20)
+    participant DB as MariaDB<br/>(192.168.20.30)
+    participant DinD as Docker-in-Docker<br/>(192.168.20.40)
+    participant PMA as PHPMyAdmin<br/>(192.168.10.20 / 192.168.20.50)
+    
+    Note over User, PMA: Frontend Network Interactions
+    User->>FrontNet: HTTP/HTTPS Request (Port 80/443)
+    FrontNet->>Apache: Forward request
+    Apache-->>FrontNet: Return response
+    FrontNet-->>User: Deliver response
+    
+    User->>FrontNet: PHPMyAdmin Request (Port 8080)
+    FrontNet->>PMA: Forward request
+    PMA-->>FrontNet: Return response
+    FrontNet-->>User: Deliver response
+    
+    Note over Apache, PMA: Backend Network Interactions
+    Apache->>BackNet: PHP request via Unix socket
+    BackNet->>PHP: Forward request
+    PHP->>BackNet: Database query
+    BackNet->>DB: Forward query
+    DB-->>BackNet: Return results
+    BackNet-->>PHP: Deliver results
+    PHP-->>BackNet: Return processed response
+    BackNet-->>Apache: Deliver response
+    
+    PMA->>BackNet: Database operations
+    BackNet->>DB: Forward operations
+    DB-->>BackNet: Return results
+    BackNet-->>PMA: Deliver results
+    
+    Apache->>BackNet: Docker operations
+    BackNet->>DinD: Forward to Docker daemon
+    DinD-->>BackNet: Return results
+    BackNet-->>Apache: Deliver results 

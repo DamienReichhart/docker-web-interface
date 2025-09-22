@@ -1,0 +1,47 @@
+sequenceDiagram
+    title Docker Container Startup Sequence
+    
+    participant User as User
+    participant DC as Docker Compose
+    participant Apache as Apache Container
+    participant PHP as PHP-FPM Container
+    participant DB as MariaDB Container
+    participant PMA as PHPMyAdmin Container
+    participant DinD as Docker-in-Docker Container
+    
+    User->>DC: docker-compose up
+    
+    %% DB Container Startup
+    DC->>DB: Create and start container
+    Note over DB: Load configuration from env variables
+    DB->>DB: Initialize database with init.sql
+    DB->>DC: Ready
+
+    %% PHP Container Startup
+    DC->>PHP: Create and start container
+    PHP->>PHP: Configure PHP extensions
+    PHP->>PHP: Configure FPM to use Unix socket
+    PHP->>DC: Ready
+    
+    %% Apache Container Startup
+    DC->>Apache: Create and start container
+    Apache->>Apache: Load configuration
+    Apache->>Apache: Configure virtual hosts
+    Apache->>Apache: Configure SSL
+    Apache->>Apache: Setup proxy to PHP-FPM
+    Apache->>DC: Ready
+    
+    %% PHPMyAdmin Container Startup
+    DC->>PMA: Create and start container
+    PMA->>PMA: Configure connection to DB
+    PMA->>DC: Ready
+    
+    %% Docker-in-Docker Container Startup
+    DC->>DinD: Create and start container
+    DinD->>DinD: Start Docker daemon
+    DinD->>DinD: Setup SSH access
+    DinD->>DC: Ready
+    
+    DC->>User: All containers running
+    
+    Note over User, DinD: System ready for HTTP requests 

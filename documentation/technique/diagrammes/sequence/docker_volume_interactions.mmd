@@ -1,0 +1,45 @@
+sequenceDiagram
+    title Docker Volume Management and Interactions
+    
+    participant User as Developer
+    participant Host as Host Filesystem
+    participant Apache as Apache Container
+    participant PHP as PHP-FPM Container
+    participant DB as MariaDB Container
+    participant PhpSocket as PHP Socket Volume
+    participant DbSocket as DB Socket Volume
+    
+    Note over User, DbSocket: Application Code Mounting
+    
+    User->>Host: Modifies application code
+    Host-->>Apache: Changes reflected (mounted volume)
+    Host-->>PHP: Changes reflected (mounted volume)
+    
+    Note over Apache, PHP: Inter-container Communication via Sockets
+    
+    Apache->>PhpSocket: Connect to PHP-FPM via Unix socket
+    PhpSocket->>PHP: Forward request
+    PHP-->>PhpSocket: Return response
+    PhpSocket-->>Apache: Deliver response
+    
+    Note over PHP, DB: Database Access via Sockets
+    
+    PHP->>DbSocket: Database connection via Unix socket
+    DbSocket->>DB: Forward connection
+    DB-->>DbSocket: Return data
+    DbSocket-->>PHP: Deliver data
+    
+    Note over DB, Host: Database Persistence
+    
+    DB->>Host: Write database files to ./docker/db
+    Host-->>DB: Read database files from ./docker/db
+    
+    Note over User, DbSocket: SQL Initialization
+    
+    User->>Host: Modifies ./sql/init.sql
+    Host-->>DB: SQL file mounted and executed on first startup
+    
+    Note over Apache, PHP: PHP Configuration
+    
+    User->>Host: Updates PHP configuration
+    Host-->>PHP: Configuration applied via mounted volume 

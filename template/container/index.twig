@@ -1,0 +1,93 @@
+{% extends 'layout/base.twig' %}
+
+{% block content %}
+    <h1 class="container my-4">Serveur : {{ server.nameServers }}</h1>
+    <main class="container my-4">
+        <!-- Header Section -->
+        <div id="entete" class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+
+            <div id="infosrv" class="d-flex align-items-center mb-3 mb-md-0">
+                <h2 class="me-3">Conteneurs disponibles</h2>
+                <a href="/container/add/{{ server.urlIdentifierServer }}" style="text-decoration: none">
+                    <button class="btn btn-light" id="newcont" type="button">
+                        Ajouter un conteneur
+                        <img id="plus" src="/assets/img/plus.svg" alt="Ajouter" class="ms-2" width="16" height="16">
+                    </button>
+                </a>
+            </div>
+            <input id="recherche" type="text" class="form-control w-25" placeholder="Rechercher" aria-label="Rechercher">
+        </div>
+
+        <!-- Containers List -->
+        <div class="row">
+            {% for container in containers %}
+                <div class="col-12 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body d-flex justify-content-between align-items-start">
+
+                            <!-- Info Section -->
+                            <div class="info">
+                                <h5 class="card-title">{{ container.name | removeFirstCharacter }} | {{ container.id }}</h5>
+                                <p class="card-text mb-1"><strong>Image:</strong> {{ container.image }}</p>
+                                <p class="card-text"><strong>Ports:</strong>
+                                    {% for port in container.ports.ports %}
+                                        <a href="http://{{ server.host }}:{{ port.getHostPort() }}">{{ port }}</a>,
+                                    {% endfor %}
+                                </p>
+                            </div>
+
+                            <!-- Status Section -->
+                            <div class="status text-end">
+                                {% if container.status.value == 'RUNNING' %}
+                                <img
+                                        class="server-status me-2"
+                                        src="/assets/img/play.svg"
+                                        alt="Server Status"
+                                        title="Server Status : Running"
+                                        style="width: 20px; height: 20px; cursor: default;"
+                                >
+                                {% else %}
+                                    <img
+                                            class="server-status me-2"
+                                            src="/assets/img/stopped.svg"
+                                            alt="Server Status"
+                                            title="Server Status : Stopped"
+                                            style="width: 20px; height: 20px; cursor: default;"
+                                    >
+                                {% endif %}
+                                <div class="status">
+                                    <div class="dropdown">
+                                            <img class="parametre dropdown-toggle"
+                                                 src="/assets/img/para.svg"
+                                                 id="dropdownMenuButton"
+                                                 data-bs-toggle="dropdown"
+                                                 aria-expanded="false"
+                                                 style="cursor: pointer;" alt="">
+                                        <!-- Dropdown menu -->
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            <li><a class="dropdown-item" href="/container/{{ server.urlIdentifierServer }}/{{ container.id }}">Modifier le conteneur</a></li>
+                                            {% if container.status.value == 'RUNNING' %}
+                                            <li><a class="dropdown-item" href="/container/stop/{{ server.urlIdentifierServer }}/{{ container.id }}">Stoper le conteneur</a></li>
+                                            {% else %}
+                                            <li><a class="dropdown-item" href="/container/start/{{ server.urlIdentifierServer }}/{{ container.id }}">Démarrer le conteneur</a></li>
+                                            {% endif %}
+                                            <li><a class="dropdown-item" href="/container/delete/{{ server.urlIdentifierServer }}/{{ container.id }}">Supprimer le conteneur</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                        <!-- Card Footer -->
+                        <div class="card-footer text-end">
+                            <a href="/container/{{ server.urlIdentifierServer }}/{{ container.id }}" class="btn btn-outline-secondary btn-sm">Détail</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    </main>
+{% endblock %}

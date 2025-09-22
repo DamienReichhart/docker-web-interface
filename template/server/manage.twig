@@ -1,0 +1,155 @@
+{% extends 'layout/base.twig' %}
+
+{% block content %}
+<main>
+    <div id="entete">
+        <div id="infosrv">
+            <h2>{{ server.nameServers }}</h2>
+            <a href="/server"><button id="retour" class="btn btn-secondary">Retour aux serveurs</button></a>
+        </div>
+    </div>
+
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Détails du serveur</h4>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Nom:</strong> {{ server.nameServers }}</p>
+                        <p><strong>Hôte:</strong> {{ server.host }}</p>
+                        <p><strong>Utilisateur SSH:</strong> {{ serverAccess.sshUserManageServers }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4>Conteneurs Docker</h4>
+                        <a href="/container/add/{{ server.urlIdentifierServer }}" class="btn btn-primary">Ajouter un conteneur</a>
+                    </div>
+                    <div class="card-body">
+                        {% if containers is empty %}
+                            <div class="alert alert-info">
+                                <strong>Aucun conteneur trouvé.</strong> 
+                                Ajoutez un nouveau conteneur en cliquant sur le bouton "Ajouter un conteneur".
+                            </div>
+                        {% else %}
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Nom</th>
+                                            <th>Image</th>
+                                            <th>Statut</th>
+                                            <th>Ports</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for container in containers %}
+                                            <tr>
+                                                <td>{{ container.id }}</td>
+                                                <td>{{ container.name }}</td>
+                                                <td>{{ container.image }}</td>
+                                                <td>
+                                                    {% if container.status.value == 'RUNNING' %}
+                                                        <span class="badge bg-success">En cours</span>
+                                                    {% elseif container.status.value == 'STARTING' %}
+                                                        <span class="badge bg-info">Démarrage</span>
+                                                    {% elseif container.status.value == 'CREATED' %}
+                                                        <span class="badge bg-secondary">Créé</span>
+                                                    {% elseif container.status.value == 'ERROR' %}
+                                                        <span class="badge bg-danger">Erreur</span>
+                                                    {% else %}
+                                                        <span class="badge bg-danger">Arrêté</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ container.ports }}</td>
+                                                <td>
+                                                    <div class="btn-group btn-group-sm">
+                                                        <a href="/container/{{ server.urlIdentifierServer }}/{{ container.id }}" class="btn btn-info">Détails</a>
+                                                        {% if container.status == 'RUNNING' %}
+                                                            <a href="/container/stop/{{ server.urlIdentifierServer }}/{{ container.id }}" class="btn btn-warning">Arrêter</a>
+                                                        {% else %}
+                                                            <a href="/container/start/{{ server.urlIdentifierServer }}/{{ container.id }}" class="btn btn-success">Démarrer</a>
+                                                        {% endif %}
+                                                        <a href="/container/delete/{{ server.urlIdentifierServer }}/{{ container.id }}" class="btn btn-danger" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce conteneur?')">Supprimer</a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4>Images Docker</h4>
+                        <a href="/images/pull/{{ server.urlIdentifierServer }}" class="btn btn-primary">Télécharger une image</a>
+                    </div>
+                    <div class="card-body">
+                        {% if images is empty %}
+                            <div class="alert alert-info">
+                                <strong>Aucune image trouvée.</strong> 
+                                Téléchargez une nouvelle image en cliquant sur le bouton "Télécharger une image".
+                            </div>
+                        {% else %}
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Repository</th>
+                                            <th>Tag</th>
+                                            <th>ID</th>
+                                            <th>Taille</th>
+                                            <th>Créé</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for image in images %}
+                                            <tr>
+                                                <td>{{ image.repo }}</td>
+                                                <td>{{ image.tag }}</td>
+                                                <td>{{ image.id }}</td>
+                                                <td>{{ image.size }}</td>
+                                                <td>{{ image.created }}</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4>Dockerfiles</h4>
+                        <a href="/dockerfiles/use/{{ server.urlIdentifierServer }}" class="btn btn-primary">Utiliser un Dockerfile</a>
+                    </div>
+                    <div class="card-body">
+                        <p>Construisez des images personnalisées à partir de Dockerfiles.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %} 

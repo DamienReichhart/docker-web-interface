@@ -1,0 +1,41 @@
+{
+  "GLOBAL" : {
+    "entryMiddlewares": [
+      "securityMiddleware",
+      "logMiddleware"
+    ],
+    "exitMiddlewares": [
+
+    ]
+  },
+  "GET" : {
+    "#^/$#": [
+
+    ],
+    "#^/hello$#": {
+      "entryMiddlewares": [
+
+      ],
+      "exitMiddlewares": [
+      ]
+    },
+    "#^/Server$#": {
+      "entryMiddlewares": [
+
+      ],
+      "exitMiddlewares": [
+      ]
+    },
+    "#^/dockerfile$#": {
+      "entryMiddlewares": [
+
+      ],
+      "exitMiddlewares": [
+      ]
+    }
+  },
+  "POST" : {
+
+  }
+}
+

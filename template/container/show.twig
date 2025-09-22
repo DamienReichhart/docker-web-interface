@@ -1,0 +1,345 @@
+{% extends 'layout/base.twig' %}
+
+{% block content %}
+    <a href="/server/manage/{{ server.urlIdentifierServer }}">
+        <button class="btn btn-light" id="newcont" type="button">
+            Retour
+        </button>
+    </a>
+    <main class="container my-4">
+
+        <!-- Header Section -->
+        <div id="entete" class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+            <div id="infosrv" class="d-flex align-items-center mb-3 mb-md-0">
+                <h2 class="me-3">{{ container.name }} | {{ container.id }} <p>{{ container.image }}</p></h2>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body d-flex justify-content-between align-items-start">
+                        <div class="info">
+                            <h5 class="card-title">Ports</h5>
+                            {% for port in container.getPortsObject().getAllPorts() %}
+                                <p class="card-text">{{ loop.index }}. {{ port }}</p>
+                            {% else %}
+                                <p>Pas de mappage de port définit</p>
+                            {% endfor %}
+                            <a href="/container/edit/{{ server.urlIdentifierServer }}/{{ container.id }}/ports"><button class="btn btn-secondary">Modifier un port</button></a>
+                            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#deletePortModal">Supprimer un port</button>
+                            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addPortModal">Ajouter un port</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body d-flex justify-content-between align-items-start">
+                        <div class="info">
+                            <h5 class="card-title">Volumes</h5>
+                            {% for volume in container.getVolumes().volumes %}
+                                <p class="card-text">{{ loop.index }}. {{ volume }}</p>
+                            {% else %}
+                                <p>Pas de mappage de volume définit</p>
+                            {% endfor %}
+                            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addVolumeModal">Ajouter un volume</button>
+                            <a href="/container/edit/{{ server.urlIdentifierServer }}/{{ container.id }}/volumes"><button class="btn btn-secondary">Modifier un volume</button></a>
+                            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#deleteVolumeModal">Supprimer un volume</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body d-flex justify-content-between align-items-start">
+                        <div class="info">
+                            <h5 class="card-title">Environment</h5>
+                            {% for env in container.getEnv().envs %}
+                                <p class="card-text">{{ loop.index }}. {{ env }}</p>
+                            {% else %}
+                                <p>Pas de mappage de volume définit</p>
+                            {% endfor %}
+                            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addEnvModal">Ajouter une variable d'environnement</button>
+                            <a href="/container/edit/{{ server.urlIdentifierServer }}/{{ container.id }}/envs"><button class="btn btn-secondary">Modifier une variable d'environnement</button></a>
+                            <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#deleteEnvModal">Supprimer une variable d'environnement</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Port Modal -->
+            <div class="modal fade" id="addPortModal" tabindex="-1" aria-labelledby="addPortModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addPortModalLabel">Ajouter un port</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="addPortForm" action="/container/add/{{ server.urlIdentifierServer }}/{{ container.id }}/ports/post" method="post">
+                                <div class="mb-3">
+                                    <label for="externalPort" class="form-label">Port externe</label>
+                                    <input type="text" class="form-control" id="externalPort" name="externalPort" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="internalPort" class="form-label">Port interne</label>
+                                    <input type="text" class="form-control" id="internalPort" name="internalPort" required>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" form="addPortForm" class="btn btn-primary">Ajouter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete Port Modal -->
+            <div class="modal fade" id="deletePortModal" tabindex="-1" aria-labelledby="deletePortModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deletePortModalLabel">Supprimer un port</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="deletePortForm" action="/container/delete/{{ server.urlIdentifierServer }}/{{ container.id }}/ports" method="post">
+                                <div class="mb-3">
+                                    <label for="portToDelete" class="form-label">Sélectionnez le port à supprimer</label>
+                                    <select class="form-select" id="portToDelete" name="portId" required>
+                                        <option value="" selected disabled>Choisissez un port...</option>
+                                        {% for port in container.getPortsObject().getAllPorts() %}
+                                            <option value="{{ port }}">{{ port }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" form="deletePortForm" class="btn btn-danger">Supprimer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete Volume Modal -->
+            <div class="modal fade" id="deleteVolumeModal" tabindex="-1" aria-labelledby="deleteVolumeModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteVolumeModalLabel">Supprimer un volume</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="deleteVolumeForm" action="/container/delete/{{ server.urlIdentifierServer }}/{{ container.id }}/volumes" method="post">
+                                <div class="mb-3">
+                                    <label for="volumeToDelete" class="form-label">Sélectionnez le volume à supprimer</label>
+                                    <select class="form-select" id="volumeToDelete" name="volumeId" required>
+                                        <option value="" selected disabled>Choisissez un volume...</option>
+                                        {% for volume in container.getVolumes().volumes %}
+                                            <option value="{{ volume }}">{{ volume }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" form="deleteVolumeForm" class="btn btn-danger">Supprimer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete Environment Variable Modal -->
+            <div class="modal fade" id="deleteEnvModal" tabindex="-1" aria-labelledby="deleteEnvModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteEnvModalLabel">Supprimer une variable d'environnement</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="deleteEnvForm" action="/container/delete/{{ server.urlIdentifierServer }}/{{ container.id }}/envs" method="post">
+                                <div class="mb-3">
+                                    <label for="envToDelete" class="form-label">Sélectionnez la variable d'environnement à supprimer</label>
+                                    <select class="form-select" id="envToDelete" name="envId" required>
+                                        <option value="" selected disabled>Choisissez une variable d'environnement...</option>
+                                        {% for env in container.getEnv().envs %}
+                                            <option value="{{ env }}">{{ env }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" form="deleteEnvForm" class="btn btn-danger">Supprimer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Volume Modal -->
+            <div class="modal fade" id="addVolumeModal" tabindex="-1" aria-labelledby="addVolumeModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addVolumeModalLabel">Ajouter un volume</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="addVolumeForm" action="/container/add/{{ server.urlIdentifierServer }}/{{ container.id }}/volumes/post" method="post">
+                                <div class="mb-3">
+                                    <label for="sourceVolume" class="form-label">Volume source</label>
+                                    <input type="text" class="form-control" id="sourceVolume" name="sourceVolume" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="targetVolume" class="form-label">Volume cible</label>
+                                    <input type="text" class="form-control" id="targetVolume" name="targetVolume" required>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" form="addVolumeForm" class="btn btn-primary">Ajouter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add Environment Variable Modal -->
+            <div class="modal fade" id="addEnvModal" tabindex="-1" aria-labelledby="addEnvModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="addEnvModalLabel">Ajouter une variable d'environnement</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="addEnvForm" action="/container/add/{{ server.urlIdentifierServer }}/{{ container.id }}/envs/post" method="post">
+                                <div class="mb-3">
+                                    <label for="envName" class="form-label">Nom de la variable</label>
+                                    <input type="text" class="form-control" id="envName" name="envName" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="envValue" class="form-label">Valeur de la variable</label>
+                                    <input type="text" class="form-control" id="envValue" name="envValue" required>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                            <button type="submit" form="addEnvForm" class="btn btn-primary">Ajouter</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body d-flex justify-content-between align-items-start">
+                        <div class="info">
+                            <h5 class="card-title">Commande</h5>
+                            <p class="card-text">{{ container.getCommand() }}</p>
+                            <a href="/container/edit/{{ server.urlIdentifierServer }}/{{ container.id }}/command"><button class="btn btn-secondary">Modifier la commande</button></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body d-flex justify-content-between align-items-start">
+                        <div class="info">
+                            <h5 class="card-title">Stats</h5>
+                            <p class="card-text">{{ container.getStats() }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body d-flex justify-content-between align-items-start">
+                        <div class="info">
+                            <h5 class="card-title">Logs</h5>
+                            {% for log in container.getLogs().logs %}
+                                <p class="card-text">{{ loop.index }}. {{ log }}</p>
+                            {% else %}
+                                <p>Pas de mappage de volume définit</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check for empty options in all delete modals
+        const modals = {
+            'deletePortModal': 'portToDelete',
+            'deleteVolumeModal': 'volumeToDelete',
+            'deleteEnvModal': 'envToDelete'
+        };
+
+        Object.entries(modals).forEach(([modalId, selectId]) => {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.addEventListener('show.bs.modal', function() {
+                    const select = document.getElementById(selectId);
+                    if (select && select.options.length <= 1) {
+                        alert('Aucun élément disponible pour la suppression');
+                        modal.hide();
+                    }
+                });
+            }
+        });
+
+        // Handle form submissions
+        const forms = {
+            'addPortForm': 'port',
+            'addVolumeForm': 'volume',
+            'addEnvForm': 'environment variable'
+        };
+
+        Object.entries(forms).forEach(([formId, type]) => {
+            const form = document.getElementById(formId);
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    
+                    fetch(this.action, {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            // Redirect to server management page instead of reloading
+                            window.location.href = '/server/manage/{{ server.urlIdentifierServer }}';
+                        } else {
+                            alert(`Une erreur est survenue lors de l'ajout du ${type}`);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert(`Une erreur est survenue lors de l'ajout du ${type}`);
+                    });
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

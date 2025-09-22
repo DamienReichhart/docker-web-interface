@@ -1,0 +1,54 @@
+sequenceDiagram
+    title Docker Security Implementation Sequence
+    
+    participant Client as Client
+    participant Apache as Apache Container
+    participant Crowdsec as Crowdsec Agent
+    participant Firewall as Firewall Bouncer
+    participant PHP as PHP-FPM Container
+    participant DB as MariaDB Container
+    participant DinD as Docker-in-Docker
+    
+    Note over Client, DinD: Network Security
+    
+    Client->>Apache: HTTP/HTTPS Request
+    
+    %% Crowdsec Security Flow
+    Apache->>Crowdsec: Log request for analysis
+    Crowdsec->>Crowdsec: Parse and analyze logs
+    
+    alt Malicious Request Detected
+        Crowdsec->>Firewall: Add client IP to blocklist
+        Firewall->>Client: Block future requests
+        Apache->>Client: Return 403 Forbidden
+    else Request Allowed
+        Apache->>PHP: Forward request via Unix socket
+    end
+    
+    %% Container Isolation
+    Note over Apache, DB: Container Security Isolation
+    
+    %% User permission security
+    Apache->>Apache: Run as non-root user (apache:apache)
+    PHP->>PHP: Run as non-root user (php:php)
+    DB->>DB: Run with limited privileges
+    
+    %% Volume permissions
+    Note over Apache, DB: Volume Security
+    Apache->>Apache: Access socket with specific permissions
+    PHP->>PHP: Access socket with specific permissions
+    
+    %% HTTPS communication
+    Client->>Apache: HTTPS Request
+    Apache->>Apache: SSL Termination with server.crt/key
+    Apache->>PHP: Internal communication over Unix socket
+    
+    %% Security Headers
+    PHP->>Apache: Response with generated content
+    Apache->>Apache: Add security headers
+    Apache->>Client: Response with security headers
+    
+    %% DinD Security
+    Note over DinD: Docker-in-Docker Security
+    DinD->>DinD: Run with privileged mode
+    DinD->>DinD: SSH access with authentication 

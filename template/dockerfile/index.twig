@@ -1,0 +1,193 @@
+{% extends 'layout/base.twig' %}
+
+{% block title %}Manage Dockerfiles{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mt-4 mb-4">
+                <i class="fas fa-file-code me-2 text-primary"></i>Dockerfile Management
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/server">Servers</a></li>
+                    <li class="breadcrumb-item active">Dockerfiles</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-8 col-lg-9">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-list me-2"></i>Your Dockerfiles
+                    </h5>
+                    <div>
+                        <a href="/dockerfile/add" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>Add Dockerfile
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Last Modified</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if dockerfiles.dockerfiles is empty %}
+                                <tr>
+                                    <td colspan="3" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-file-alt fa-3x mb-3"></i>
+                                            <p>No Dockerfiles have been created yet.</p>
+                                            <a href="/dockerfile/add" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-plus me-1"></i>Create Your First Dockerfile
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                    {% for dockerfile in dockerfiles.dockerfiles %}
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <i class="fas fa-file-code text-primary me-2"></i>
+                                                <span>{{ dockerfile.name }}</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="text-muted">
+                                                {{ 'now'|date('Y-m-d H:i:s') }}
+                                            </span>
+                                        </td>
+                                        <td class="text-end">
+                                            <div class="btn-group">
+                                                <a href="/dockerfile/edit/{{ dockerfile.name }}" class="btn btn-sm btn-outline-primary" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" 
+                                                        data-bs-toggle="modal" 
+                                                        data-bs-target="#deleteModal"
+                                                        data-dockerfile="{{ dockerfile.name }}"
+                                                        title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 col-lg-3">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-search me-2"></i>Search
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="input-group">
+                        <input type="text" id="dockerfile-search" class="form-control" placeholder="Find by name...">
+                        <button class="btn btn-outline-secondary" type="button">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p>
+                        Dockerfiles are text documents that contain all commands needed to build a Docker image.
+                    </p>
+                    <p>
+                        You can create, edit, and delete your Dockerfiles here, then use them to build custom images on your Docker servers.
+                    </p>
+                    <hr>
+                    <h6 class="mb-3">Getting Started</h6>
+                    <ol class="ps-3">
+                        <li class="mb-2">Create a new Dockerfile using the "Add Dockerfile" button</li>
+                        <li class="mb-2">Edit your Dockerfile with our powerful editor</li>
+                        <li>Use your Dockerfile to build images on your server</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the Dockerfile <span id="dockerfileToDelete"></span>?</p>
+                <p class="text-danger">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <a href="#" id="confirmDeleteButton" class="btn btn-danger">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Setup search functionality
+        const searchInput = document.getElementById('dockerfile-search');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function() {
+                const searchTerm = this.value.toLowerCase();
+                const tableRows = document.querySelectorAll('tbody tr');
+                
+                tableRows.forEach(row => {
+                    const fileName = row.querySelector('td:first-child').textContent.toLowerCase();
+                    if (fileName.includes(searchTerm)) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            });
+        }
+        
+        // Setup delete modal
+        const deleteModal = document.getElementById('deleteModal');
+        if (deleteModal) {
+            deleteModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const dockerfile = button.getAttribute('data-dockerfile');
+                
+                document.getElementById('dockerfileToDelete').textContent = dockerfile;
+                document.getElementById('confirmDeleteButton').href = `/dockerfile/delete/${dockerfile}`;
+            });
+        }
+    });
+</script>
+{% endblock %}

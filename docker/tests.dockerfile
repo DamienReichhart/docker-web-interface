@@ -1,0 +1,17 @@
+FROM php:8.3-cli
+
+ENV APP_ENV dev
+
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+
+RUN echo 'memory_limit = 1000M' >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini;
+RUN echo 'post_max_size = 500M' >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini;
+RUN echo 'upload_max_filesize = 500M' >> /usr/local/etc/php/conf.d/docker-php-memlimit.ini;
+
+RUN chmod +x /usr/local/bin/install-php-extensions && \
+    install-php-extensions intl pdo_mysql gd
+
+WORKDIR /var/www/html
+
+CMD [ "vendor/bin/phpunit", "tests"]
+

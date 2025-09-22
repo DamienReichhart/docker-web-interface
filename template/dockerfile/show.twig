@@ -1,0 +1,236 @@
+{% extends 'layout/base.twig' %}
+
+{% block title %}Edit Dockerfile - {{ dockerfileName }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mt-4 mb-4">
+                <i class="fas fa-file-code me-2 text-primary"></i>Edit Dockerfile
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/dockerfiles">Dockerfiles</a></li>
+                    <li class="breadcrumb-item active">{{ dockerfileName }}</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-code me-2"></i>Editor
+                    </h5>
+                    <div class="editor-actions">
+                        <button id="saveButton" class="btn btn-success me-2">
+                            <i class="fas fa-save me-1"></i>Save
+                        </button>
+                        <a href="/dockerfiles" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-1"></i>Close
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div id="editor-container">
+                        <div id="editor-toolbar" class="bg-light p-2 border-bottom">
+                            <div class="d-flex flex-wrap gap-2">
+                                <div class="d-flex align-items-center">
+                                    <label for="editor-theme" class="form-label me-2 mb-0">Theme:</label>
+                                    <select id="editor-theme" class="form-select form-select-sm" style="width: auto;">
+                                        <option value="vs">Light</option>
+                                        <option value="vs-dark" selected>Dark</option>
+                                        <option value="hc-black">High Contrast</option>
+                                    </select>
+                                </div>
+                                <div class="d-flex align-items-center ms-3">
+                                    <label for="editor-font-size" class="form-label me-2 mb-0">Font Size:</label>
+                                    <select id="editor-font-size" class="form-select form-select-sm" style="width: auto;">
+                                        <option value="12px">12px</option>
+                                        <option value="14px" selected>14px</option>
+                                        <option value="16px">16px</option>
+                                        <option value="18px">18px</option>
+                                    </select>
+                                </div>
+                                <div class="d-flex align-items-center ms-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="word-wrap" checked>
+                                        <label class="form-check-label" for="word-wrap">Word Wrap</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="editor-area"></div>
+                        <div class="editor-status-bar d-flex justify-content-between align-items-center px-3 py-1 bg-light border-top">
+                            <div id="editor-position">Line: 1, Column: 1</div>
+                            <div class="d-flex align-items-center">
+                                <span class="badge bg-primary me-2">dockerfile</span>
+                                <span id="save-status" class="text-muted">Last saved: Never</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Dockerfile Tips
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="dockerfileTips">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    Common Instructions
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne">
+                                <div class="accordion-body">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item d-flex align-items-center template-item cursor-pointer" data-template="FROM">
+                                            <strong class="me-2">FROM</strong> - Base image
+                                        </li>
+                                        <li class="list-group-item d-flex align-items-center template-item cursor-pointer" data-template="WORKDIR">
+                                            <strong class="me-2">WORKDIR</strong> - Working directory
+                                        </li>
+                                        <li class="list-group-item d-flex align-items-center template-item cursor-pointer" data-template="COPY">
+                                            <strong class="me-2">COPY</strong> - Copy files
+                                        </li>
+                                        <li class="list-group-item d-flex align-items-center template-item cursor-pointer" data-template="RUN">
+                                            <strong class="me-2">RUN</strong> - Execute commands
+                                        </li>
+                                        <li class="list-group-item d-flex align-items-center template-item cursor-pointer" data-template="ENV">
+                                            <strong class="me-2">ENV</strong> - Environment variables
+                                        </li>
+                                        <li class="list-group-item d-flex align-items-center template-item cursor-pointer" data-template="EXPOSE">
+                                            <strong class="me-2">EXPOSE</strong> - Port exposure
+                                        </li>
+                                        <li class="list-group-item d-flex align-items-center template-item cursor-pointer" data-template="CMD">
+                                            <strong class="me-2">CMD</strong> - Default command
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    Best Practices
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo">
+                                <div class="accordion-body">
+                                    <ul class="list-group list-group-flush">
+                                        <li class="list-group-item">Use specific version tags for base images</li>
+                                        <li class="list-group-item">Combine RUN commands with && to reduce layers</li>
+                                        <li class="list-group-item">Remove unnecessary files to reduce image size</li>
+                                        <li class="list-group-item">Use .dockerignore to exclude files</li>
+                                        <li class="list-group-item">Set proper environment variables</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-file-alt me-2"></i>Templates
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row row-cols-1 row-cols-md-2 g-4">
+                        <div class="col">
+                            <div class="card h-100 template-card cursor-pointer" data-template="nginx">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fas fa-server me-2 text-info"></i>Nginx</h5>
+                                    <p class="card-text">Basic Nginx web server configuration</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card h-100 template-card cursor-pointer" data-template="node">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fab fa-node-js me-2 text-success"></i>Node.js</h5>
+                                    <p class="card-text">Node.js application with npm</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card h-100 template-card cursor-pointer" data-template="php">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fab fa-php me-2 text-primary"></i>PHP</h5>
+                                    <p class="card-text">PHP application with Apache</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card h-100 template-card cursor-pointer" data-template="python">
+                                <div class="card-body">
+                                    <h5 class="card-title"><i class="fab fa-python me-2 text-warning"></i>Python</h5>
+                                    <p class="card-text">Python application with pip</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template confirmation modal -->
+    <div class="modal fade" id="templateModal" tabindex="-1" aria-labelledby="templateModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="templateModalLabel">Apply Template</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Applying a template will replace the current content. Are you sure you want to continue?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmTemplate">Apply Template</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Save success toast -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 5">
+        <div id="saveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header bg-success text-white">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong class="me-auto">Success</strong>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                Dockerfile saved successfully.
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.36.1/min/vs/loader.js"></script>
+<script>
+const dockerfileName = "{{ dockerfileName }}";
+const fileContent = `{{ fileContent|escape('js')}}`;
+</script>
+<script src="/assets/js/editor.js"></script>
+{% endblock %}

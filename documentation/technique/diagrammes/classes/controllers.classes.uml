@@ -1,0 +1,111 @@
+@startuml
+class Controller {
+    + twig: Environment
+    + template: TemplateWrapper
+    + userLogged: ?User
+    + httpRequest: HttpRequest
+    + httpResponse: HttpResponse
+    + sesson: Session
+    + redirect(string url): void 
+    + render(string templatePath, aray data): string
+    + getDockerHelper(Server server): DockerHelper
+    + getSshHelper(Server server): SsshHelper
+    + webError(int error): void
+    + renderWebError(int error): string
+    + getHttpRequest(): HttpRequest
+    + getHttpResponse(): HttpResponse
+}
+
+class ImageController extends Controller {
+    + imagesPull(string serverRef): string
+    + imagesPullPost(string serverRef): string
+}
+
+
+class AdminController extends Controller {
+    + index(): string 
+    + show (int id): void
+    + add(): void
+    + edit(int id): void
+    + validateInputUserData(): array
+    + register(): void
+    + delete(id): void
+} 
+
+
+
+class AuthController extends Controller  {
+    + index(): string 
+    + loginPost(): string
+    + logout(): void
+}
+
+class ErrorController extends Controller {
+    + index():void
+    + error404():void
+    + error500():void
+    + error204():void 
+}
+
+class ContainerController extends Controller {
+    + add(string serverRef): string
+    + addPost(string serverRef): string
+    + startContainer(string serverRef, string containerId): string
+    + delete(string serverRef, string containerId): string
+    + stop(string serverRef, string containerId): string
+    + show(string serverRef, string containerId): string
+    + portsAdd(string serverRef, string containerId): string
+    + portsAddPost(string serverRef, string containerId): string
+    + portsEdit(string serverRef, string containerId): string
+    + portsEditPost(string serverRef, string containerId): string
+    + portsDelete(string serverRef, string containerId): string
+    + portsDeletePost(string serverRef, string containerId): string
+    + commandEdit(string serverRef, string containerId): string
+    + commandEditPost(string serverRef, string containerId): string
+    + volumesAdd(string serverRef, string containerId): string
+    + volumesAddPost(string serverRef, string containerId): string
+    + volumesEdit(string serverRef, string containerId): string
+    + volumesEditPost(string serverRef, string containerId): string
+    + volumesDelete(string serverRef, string containerId): string
+    + volumesDeletePost(string serverRef, string containerId): string
+    + envsAdd(string serverRef, string containerId): string
+    + envsAddPost(string serverRef, string containerId): string
+    + envsEdit(string serverRef, string containerId): string
+    + envsEditPost(string serverRef, string containerId): string
+    + envsDelete(string serverRef, string containerId): string
+    + envsDeletePost(string serverRef, string containerId): string
+}
+
+class DockerfileController extends Controller {
+    + index(): string 
+    + show(string dockerfileName): string 
+    + add(string dockerfileName): string 
+    + addPost(string dockerfileName): string 
+    + delete(string dockerfileName): string 
+    + save(string dockerfileName): string
+    + build(string serverRef): string
+    + buildPost(string serverRef): string
+}
+
+
+class ServerController extends Controller {
+    + index(): string 
+    + add(): string
+    + addPost(): string
+    + addAccess(): string
+    + addAccessPost(): string
+    + edit(string serverRef): string
+    + editPost(string serverRef): string
+    + delete(string serverRef): string
+    + manage(string serverRef): string
+}
+
+class UserController extends Controller {
+    + index(): string
+    + add(): string
+    + addPost(): string
+    + edit(string userId): string
+    + editPost(string userId): string
+    + delete(string userId): string
+}
+@enduml

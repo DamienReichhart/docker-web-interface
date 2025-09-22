@@ -1,0 +1,29 @@
+graph TB
+    subgraph "Système de Gestion de Conteneurs Docker"
+        App[Application Web]
+    end
+
+    subgraph "Acteurs Principaux"
+        Admin[Administrateur Système]
+        User[Utilisateur]
+    end
+
+    subgraph "Acteurs Secondaires"
+        Docker[Docker Engine]
+        DB[(Base de Données)]
+    end
+
+    %% Interactions
+    Admin -->|Gère| App
+    User -->|Utilise| App
+    App -->|Interagit avec| Docker
+    App -->|Stocke les données| DB
+
+    %% Légende
+    classDef primary fill:#f9f,stroke:#333,stroke-width:2px
+    classDef secondary fill:#bbf,stroke:#333,stroke-width:2px
+    classDef system fill:#dfd,stroke:#333,stroke-width:2px
+
+    class Admin,User primary
+    class Docker,DB,GitLab secondary
+    class App system

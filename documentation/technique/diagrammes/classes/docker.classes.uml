@@ -1,0 +1,183 @@
+@startuml
+class DockerImages {
+    + images: array<DockerSingleImage>
+    + getImages(): array<DockerSingleImage>
+    + parse(string commandOutput): void
+}
+
+class DockerSingleImage {
+    + repository: string
+    + tag: string
+    + size: string
+    + imageId: string
+    + createdAt: DateTime
+    + digest: string
+    + getRepository(): string
+    + getTag(): string
+    + getSize(): string
+    + getImageId(): string
+    + getCreatedAt(): DateTime
+    + getDigest(): string
+    + remove(): void
+}
+
+class DockerContainerLogs {
+    + logs: array<SingleDockerLog>
+    + getLogs(): array<SingleDockerLog>
+    + parse(string commandOutput): void
+}
+
+class DockerSingleContainerLogs {
+    + message: string
+    + timestamp: DateTime
+    + getMessage(): string
+    + getTimestamp(): DateTime
+}
+
+class DockerContainers {
+    + containers: array<DockerSingleContainer>
+    + getContainers(): List<DockerSingleContainer>
+    + parse(string commandOutput): void
+}
+
+class DockerSingleContainer {
+    + id: String
+    + image: DockerSingleImage
+    + status: DockerContainerStausEnum
+    + createdAt: DateTimeImmutable
+    + name String
+    + getId(): string
+    + getImage: DockerSingleImage
+    + getVolumes(): DockerVolumes
+    + getPorts(): DockerContainerPorts
+    + getInspect(): DockerContainerInspect
+    + getLogs(): DockerContainerLogs
+    + GetStats(): DockerContainerStats
+    + getPorts(): DockerContainerPorts
+    + GetVolumes(): DockerVolumes
+    + start(): void
+    + stop(): void
+}
+
+class DockerContainerVolumes {
+    + volumes: array<DockerSingleContainerVolume>
+    + getVolumes(): array<DockerSingleContainerVolume>
+}
+
+class DockerSingleContainerVolume {
+    + source: string
+    + target: string
+    + getSource(): string
+    + getTarget(): string
+    + toVolumeMap(): string
+}
+
+class DockerContainerPorts {
+    + ports: array<DockerSingleContainerPort>
+    + getPorts(): array<DockerSingleContainerPort>
+}
+
+class DockerSingleContainerPort {
+    + hostPort: string
+    + containerPort: string
+    + getHostPort(): string
+    + getContainerPort(): string
+    + toPortMap(): string
+}
+
+class DockerContainerCommand {
+    + command: string
+    + getCommand: string
+}
+
+
+class DockerContainerStats {
+    + cpuUsage: float
+    + memoryUsage: string
+    + getcpuUsage(): float
+    + getMemoryUsage(): string
+}
+
+class DockerContainerInspect {
+    + config: stdClass
+    + getConfig(): stdClass
+    + parse(string commandOutput): void
+}
+
+
+Class SshHelper {
+    + connection: mixed
+    + host: string
+    + user: string
+    + pass: string
+    + port: string
+    + sudo: bool
+    + connect(): bool
+    + executeCommand(string command): string
+    + executeCommandInBackground(string command): bool
+    + sendFile(string localPath, string distantPath): void
+}
+
+class DockerHelper {
+    + sshHlper: SshHelper
+    + parse(): DockerContainers
+    + getContainers(): DockerContainers
+    + inspectContainer(string containerId): string
+    + inspectImage(string imageId): string
+    + startContainer(string containerId): string
+    + stopContainer(string $containerId): string
+    + runImage(string image, string name, array env, array ports, string entryCommand): string
+    + getContainerEnv(string containerId): string
+    + getImages(): string
+    + pullImage(string repoWithTag): string
+    + getContainerLogs(string containerId): string
+    + getContainerStats(string containerId): string
+    + deleteContainer(string containerId): string
+    + getContainer(string containerId): string
+    + reRunContainer(DockerSingleContainer container): string
+    + buildCustomImage(string imagePath, string name)
+    + runNewContainer(DockerSingleImage image, string name, string command,array ports, array volumes): bool
+}
+
+class DockerSingleContainerEnv {
+    + key: string
+    + value: string
+    + getKey(): string
+    + getValue(): string 
+}
+
+class DockerContainerEnv {
+    + env: array[DockerSingleContainerEnv]
+    + getEnv(): array[DockerSingleContainerEnv]
+    + addEnv(mixed envName, mixed envValue): void
+}
+
+class Dockerfiles {
+   + dockerfiles: array[SingleDockerfile]
+   + getDockerfiles(): array[SingleDockerfile]
+}
+
+class SingleDockerfile {
+   + name: string
+   + getName(): string
+}
+
+
+DockerHelper "1" -- "0..*" SshHelper
+DockerContainers "1" -- "1" DockerHelper
+DockerImages "1" -- "0..*" DockerSingleImage
+DockerContainerLogs "1" -- "0..*" DockerSingleContainerLogs
+DockerContainers "1" -- "0..*" DockerSingleContainer
+DockerSingleContainer "1" -- "1" DockerContainerStats
+DockerSingleContainer "1" -- "1" DockerContainerInspect
+DockerSingleContainer "1" -- "1" DockerContainerLogs
+DockerSingleContainer "1" -- "1" DockerSingleImage
+DockerSingleContainer "1" -- "1" DockerContainerCommand
+DockerSingleContainer "1" -- "1" DockerContainerPorts
+DockerContainerPorts "0..*" -- "1" DockerSingleContainerPort
+DockerSingleContainer "1" -- "1" DockerContainerVolumes
+DockerContainerVolumes "0..*" -- "1" DockerSingleContainerVolume
+Dockerfiles "0..*" -- "1" SingleDockerfile
+DockerSingleContainer "1" -- "1" DockerContainerEnv
+DockerSingleContainerEnv "0..*" -- "1" DockerContainerEnv
+@enduml

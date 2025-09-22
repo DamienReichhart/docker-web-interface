@@ -1,0 +1,10 @@
+{% extends 'layout/base.twig' %}
+
+
+{% block content %}
+
+<h2>{% block errorCode %} error 500 {% endblock %}</h2> 
+
+<p>{% block message %} error serveur {% endblock %}</p>
+
+{% endblock %}

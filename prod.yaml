@@ -1,0 +1,100 @@
+networks:
+  front:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.10.0/24
+          gateway: 192.168.10.1
+  back:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.20.0/24
+          gateway: 192.168.20.1
+
+
+services:
+  apache:
+    build:
+      context: ./docker
+      dockerfile: ./apache.dockerfile
+    container_name: apache
+    ports:
+      - 80:80
+      - 443:443
+    restart: unless-stopped
+    volumes:
+      - .:/var/www/html
+      - php-socket:/var/run
+    depends_on:
+      - db
+      - php
+      - dind
+    networks:
+      front:
+        ipv4_address: 192.168.10.10
+      back:
+        ipv4_address: 192.168.20.10
+
+  php:
+    build:
+      context: ./docker
+      dockerfile: ./php.dockerfile
+    volumes:
+      - .:/var/www/html
+      - php-socket:/var/run
+      - ./docker/php/prod.php.ini:/usr/local/etc/php/php.ini
+      - db-socket:/var/run/mysqld
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      back:
+        ipv4_address: 192.168.20.20
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+
+
+  db:
+    image: mariadb:latest
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - ./docker/db:/var/lib/mysql
+      - db-socket:/var/run/mysqld
+    restart: unless-stopped
+    networks:
+      back:
+        ipv4_address: 192.168.20.30
+
+  dind:
+    build:
+      context: ./docker
+      dockerfile: ./dind.dockerfile
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    privileged: true
+    networks:
+      back:
+        ipv4_address: 192.168.20.40
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: tunnel
+    networks:
+      front:
+        ipv4_address: 192.168.10.20
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN} --url https://192.168.10.10
+
+
+
+volumes:
+  php-socket:        
+    driver: local
+  db-socket:
+    driver: local

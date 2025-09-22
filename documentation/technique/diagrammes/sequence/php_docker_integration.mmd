@@ -1,0 +1,60 @@
+sequenceDiagram
+    title PHP Application Docker Integration
+    
+    participant Client as Client
+    participant Controller as Controller
+    participant DockerHelper as DockerHelper
+    participant SshHelper as SshHelper
+    participant DinD as Docker-in-Docker
+    participant Containers as Docker Containers
+    
+    Client->>Controller: Request Docker operation
+    
+    Controller->>Controller: Get server details
+    Controller->>Controller: Get SSH credentials
+    
+    Controller->>SshHelper: Create SshHelper(host, user, password)
+    SshHelper->>SshHelper: Establish SSH connection
+    
+    Controller->>DockerHelper: getInstance(sshHelper)
+    DockerHelper->>DockerHelper: Initialize Docker client
+    
+    alt List Containers
+        Controller->>DockerHelper: listContainers()
+        DockerHelper->>SshHelper: executeCommand("docker ps")
+        SshHelper->>DinD: Execute command over SSH
+        DinD->>Containers: Request container list
+        Containers->>DinD: Return container data
+        DinD->>SshHelper: Return command output
+        SshHelper->>DockerHelper: Parse output
+        DockerHelper->>Controller: Return container list
+    else Start Container
+        Controller->>DockerHelper: startContainer(containerId)
+        DockerHelper->>SshHelper: executeCommand("docker start...")
+        SshHelper->>DinD: Execute command over SSH
+        DinD->>Containers: Start container
+        Containers->>DinD: Return status
+        DinD->>SshHelper: Return command output
+        SshHelper->>DockerHelper: Parse status
+        DockerHelper->>Controller: Return operation result
+    else Stop Container
+        Controller->>DockerHelper: stopContainer(containerId)
+        DockerHelper->>SshHelper: executeCommand("docker stop...")
+        SshHelper->>DinD: Execute command over SSH
+        DinD->>Containers: Stop container
+        Containers->>DinD: Return status
+        DinD->>SshHelper: Return command output
+        SshHelper->>DockerHelper: Parse status
+        DockerHelper->>Controller: Return operation result
+    else Build Image
+        Controller->>DockerHelper: buildImage(options)
+        DockerHelper->>SshHelper: executeCommand("docker build...")
+        SshHelper->>DinD: Execute command over SSH
+        DinD->>Containers: Build image
+        Containers->>DinD: Return build logs
+        DinD->>SshHelper: Return command output
+        SshHelper->>DockerHelper: Parse logs
+        DockerHelper->>Controller: Return build result
+    end
+    
+    Controller->>Client: Return operation result 

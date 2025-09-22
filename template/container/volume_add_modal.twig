@@ -1,0 +1,10 @@
+<form id="addVolumeForm" action="/container/add/{{ server.urlIdentifierServer }}/{{ container.id }}/volumes/post" method="post">
+    <div class="mb-3">
+        <label for="sourceVolume" class="form-label">Volume source</label>
+        <input type="text" class="form-control" id="sourceVolume" name="sourceVolume" required>
+    </div>
+    <div class="mb-3">
+        <label for="targetVolume" class="form-label">Volume cible</label>
+        <input type="text" class="form-control" id="targetVolume" name="targetVolume" required>
+    </div>
+</form> 

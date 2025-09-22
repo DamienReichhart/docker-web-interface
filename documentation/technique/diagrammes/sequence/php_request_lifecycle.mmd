@@ -1,0 +1,70 @@
+sequenceDiagram
+    title PHP Application Request Lifecycle
+    
+    participant Client as Client Browser
+    participant Apache as Apache Server
+    participant PHP as PHP-FPM
+    participant index as index.php
+    participant Request as HttpRequest
+    participant Response as HttpResponse
+    participant Session as Session
+    participant Router as Router
+    participant Route as Route
+    participant Middleware as Middlewares
+    participant Controller as Controller
+    participant Model as Model
+    participant DB as Database
+    
+    Client->>Apache: HTTP Request
+    Apache->>PHP: Forward to PHP-FPM via socket
+    PHP->>index: Execute index.php
+    
+    index->>index: Load autoloader
+    index->>index: Load environment variables
+    index->>Session: Create Session
+    Session->>Session: Start session
+    index->>Request: Create HttpRequest
+    Request->>Request: Parse request data
+    index->>Response: Create HttpResponse
+    index->>Router: Create Router(request, response, session)
+    
+    Router->>Router: Load routes from routes.json
+    index->>Router: route()
+    
+    Router->>Router: Get request method & URI
+    Router->>Router: searchRoute(URI, method)
+    Router->>Route: Create Route object
+    Route->>Route: Parse route parameters
+    Route->>Route: Load middlewares
+    
+    alt Route Found
+        Router->>Middleware: Call entry middlewares
+        Middleware->>Middleware: Execute pre-controller logic
+        
+        Router->>Controller: Instantiate controller
+        Controller->>Controller: Initialize Twig
+        Router->>Controller: Call action method
+        
+        Controller->>Model: Interact with model(s)
+        Model->>DB: Execute SQL queries
+        DB->>Model: Return data
+        Model->>Controller: Return processed data
+        
+        Controller->>Controller: Render template
+        Controller->>Response: Append rendered content
+        
+        Router->>Middleware: Call exit middlewares
+        Middleware->>Middleware: Execute post-controller logic
+        
+        Router->>Response: send()
+        Response->>PHP: Output HTTP response
+    else Route Not Found
+        Router->>Controller: Create ErrorController
+        Controller->>Controller: error404()
+        Controller->>Response: Append error page
+        Router->>Response: send()
+        Response->>PHP: Output HTTP response
+    end
+    
+    PHP->>Apache: Return response
+    Apache->>Client: HTTP Response 

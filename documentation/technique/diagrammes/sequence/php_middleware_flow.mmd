@@ -1,0 +1,50 @@
+sequenceDiagram
+    title Middleware Implementation Flow
+    
+    participant Client as Client
+    participant Router as Router
+    participant EntryMiddleware as Entry Middleware
+    participant Controller as Controller Action
+    participant ExitMiddleware as Exit Middleware
+    participant Response as Response
+    
+    Client->>Router: HTTP Request
+    
+    Router->>Router: Find matching route
+    
+    Note over Router, ExitMiddleware: Middleware Execution Flow
+    
+    Router->>EntryMiddleware: Execute entry middlewares
+    
+    loop For each entry middleware
+        EntryMiddleware->>EntryMiddleware: Check conditions
+        
+        alt Middleware Allows Request
+            EntryMiddleware->>EntryMiddleware: Modify request if needed
+            EntryMiddleware->>EntryMiddleware: Continue to next middleware
+        else Middleware Blocks Request
+            EntryMiddleware->>Router: Return early (authentication failure, etc.)
+            Router->>Response: Generate error response
+            Response->>Client: Send error response
+        end
+    end
+    
+    EntryMiddleware->>Controller: Pass control to controller
+    Controller->>Controller: Process request
+    Controller->>Response: Generate response
+    Controller->>ExitMiddleware: Pass to exit middlewares
+    
+    loop For each exit middleware
+        ExitMiddleware->>ExitMiddleware: Process response
+        ExitMiddleware->>ExitMiddleware: Modify response if needed
+        ExitMiddleware->>ExitMiddleware: Continue to next middleware
+    end
+    
+    ExitMiddleware->>Response: Final response
+    Response->>Client: HTTP Response
+    
+    Note over Client, Response: Common Middleware Uses
+    
+    Note right of EntryMiddleware: Entry Middleware:<br/>- Authentication<br/>- Request validation<br/>- Security checks<br/>- Logging
+    
+    Note right of ExitMiddleware: Exit Middleware:<br/>- Response formatting<br/>- Adding headers<br/>- Caching<br/>- Performance metrics 

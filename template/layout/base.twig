@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link href="/assets/css/styles.css" rel="stylesheet">
+    <link href="/assets/css/docker-image-manager.css" rel="stylesheet">
+    <link href="/assets/css/docker-editor.css" rel="stylesheet">
+    <title>{% block title %}Docker Management Portal - BTS SIO OPTION SLAM - AP 3{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+    
+    <!-- Meta tags for better SEO -->
+    <meta name="description" content="Docker Management Portal - A web interface for managing Docker containers, images, and servers">
+    <meta name="keywords" content="docker, management, containers, devops, web interface">
+    <meta name="author" content="BTS SIO OPTION SLAM - AP 3">
+    
+    <!-- Apple Touch Icon -->
+    <link rel="apple-touch-icon" href="/assets/img/favicon.png">
+    
+    <!-- Theme color for browser UI -->
+    <meta name="theme-color" content="#4361ee">
+</head>
+
+<body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <img id="logo" src="/assets/img/logo.svg" alt="Docker Portal Logo" />
+                <h3>Docker Portal</h3>
+            </div>
+
+            <ul class="list-unstyled components">
+                <li>
+                    <a href="/server">
+                        <i class="fas fa-server"></i>
+                        <span>Gestion des serveurs</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/dockerfiles">
+                        <i class="fas fa-file-code"></i>
+                        <span>Gestion des dockerfiles</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/admin">
+                        <i class="fas fa-users-cog"></i>
+                        <span>Gestion des utilisateurs</span>
+                    </a>
+                </li>
+                {% if userLogged %}
+                <li class="mt-auto">
+                    <a href="/user/edit">
+                        <i class="fas fa-user-circle"></i>
+                        <span>{{ userLogged.usernameUsers }}</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/logout" data-loading="true">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Déconnexion</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+
+        <!-- Page Content -->
+        <div id="content">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="btn btn-icon">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    
+                    <div class="d-flex align-items-center">
+                        <span class="d-none d-md-inline-block">BTS SIO OPTION SLAM - AP 3</span>
+                        <button type="button" id="darkModeToggle" class="btn btn-icon ms-3" title="Toggle Dark Mode" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                            <i class="fas fa-moon"></i>
+                        </button>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="content-body">
+                {% if flash_messages is defined and flash_messages|length > 0 %}
+                    <div class="toast-container position-fixed top-0 end-0 p-3">
+                        {% for message in flash_messages %}
+                            <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                                <div class="toast-header">
+                                    {% if message.type == 'success' %}
+                                        <span class="text-success me-2"><i class="fas fa-check-circle"></i></span>
+                                    {% elseif message.type == 'error' %}
+                                        <span class="text-danger me-2"><i class="fas fa-exclamation-circle"></i></span>
+                                    {% elseif message.type == 'warning' %}
+                                        <span class="text-warning me-2"><i class="fas fa-exclamation-triangle"></i></span>
+                                    {% else %}
+                                        <span class="text-info me-2"><i class="fas fa-info-circle"></i></span>
+                                    {% endif %}
+                                    <strong class="me-auto">{{ message.title|default('Notification') }}</strong>
+                                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                                </div>
+                                <div class="toast-body">
+                                    {{ message.content }}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Loading spinner -->
+    <div class="spinner-container">
+        <div class="loading-pulse">
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/app.js"></script>
+    
+    <script>
+        // Initialize dark mode
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for saved dark mode preference
+            if (localStorage.getItem('darkMode') === 'enabled') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('darkModeToggle').innerHTML = '<i class="fas fa-sun"></i>';
+            }
+            
+            // Dark mode toggle
+            document.getElementById('darkModeToggle').addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                const isDarkMode = document.body.classList.contains('dark-mode');
+                localStorage.setItem('darkMode', isDarkMode ? 'enabled' : 'disabled');
+                this.innerHTML = isDarkMode ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+            });
+        });
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

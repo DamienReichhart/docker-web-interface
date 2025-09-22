@@ -1,0 +1,141 @@
+{% extends 'layout/base.twig' %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h2 class="mb-0"><i class="fas fa-server me-2 text-primary"></i>Gestion des serveurs</h2>
+                    <p class="text-muted mb-0">Gérez vos serveurs Docker et leurs conteneurs</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <a href="/server/add" class="btn btn-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Ajouter un nouveau serveur">
+                        <i class="fas fa-plus me-2"></i>
+                        <span>Ajouter un serveur</span>
+                    </a>
+                    <a href="/server/add/access" class="btn btn-outline-primary" data-bs-toggle="tooltip" data-bs-placement="top" title="Ajouter un accès à un serveur existant">
+                        <i class="fas fa-key me-2"></i>
+                        <span>Ajouter un accès</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="input-group mb-0">
+                <span class="input-group-text bg-transparent border-end-0">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+                <input id="recherche" type="text" class="form-control border-start-0 ps-0" placeholder="Rechercher un serveur par nom ou adresse...">
+            </div>
+        </div>
+    </div>
+    
+    {% if servers|length == 0 %}
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <div class="py-5">
+                    <i class="fas fa-server text-muted mb-4" style="font-size: 4rem;"></i>
+                    <h4>Aucun serveur disponible</h4>
+                    <p class="text-muted mb-4">Vous n'avez pas encore de serveurs configurés</p>
+                    <a href="/server/add" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>
+                        Ajouter votre premier serveur
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div id="servers" class="servers-grid">
+            {% for server in servers %}
+                <div class="server card h-100">
+                    <div class="server-header card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0">{{ server.nameServers }}</h4>
+                        <div class="dropdown">
+                            <button class="btn btn-icon" type="button" id="dropdownMenu{{ loop.index }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-ellipsis-v"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenu{{ loop.index }}">
+                                <li>
+                                    <a class="dropdown-item" href="/server/manage/{{ server.urlIdentifierServer }}">
+                                        <i class="fas fa-cogs me-2"></i>
+                                        <span>Gérer</span>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="/server/edit/{{ server.urlIdentifierServer }}">
+                                        <i class="fas fa-edit me-2"></i>
+                                        <span>Modifier</span>
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <a class="dropdown-item text-danger" href="/server/delete/{{ server.urlIdentifierServer }}" data-confirm="Êtes-vous sûr de vouloir supprimer ce serveur ?">
+                                        <i class="fas fa-trash-alt me-2"></i>
+                                        <span>Supprimer</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="server-body card-body">
+                        <div class="mb-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-network-wired me-2 text-muted"></i>
+                                <span>{{ server.host }}</span>
+                            </div>
+                            {% if server.description is not null and server.description != '' %}
+                                <div class="d-flex align-items-start mb-2">
+                                    <i class="fas fa-info-circle me-2 text-muted mt-1"></i>
+                                    <span>{{ server.description }}</span>
+                                </div>
+                            {% endif %}
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-tag me-2 text-muted"></i>
+                                <span class="badge bg-light text-dark">Standard</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="server-footer card-footer d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <span class="server-status status-running me-2" title="Serveur actif"></span>
+                            <span class="small text-muted">Actif</span>
+                        </div>
+                        <a href="/server/manage/{{ server.urlIdentifierServer }}" class="btn btn-sm btn-primary" data-loading="true">
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize tooltips
+        const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        // Confirm delete actions
+        const deleteLinks = document.querySelectorAll('a[data-confirm]');
+        deleteLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                const message = this.getAttribute('data-confirm');
+                if (!confirm(message)) {
+                    e.preventDefault();
+                } else {
+                    showLoading();
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

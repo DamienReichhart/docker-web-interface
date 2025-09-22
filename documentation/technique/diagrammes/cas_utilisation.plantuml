@@ -1,0 +1,61 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor Utilisateur as User
+actor Administrateur as Admin
+Admin --|> User
+
+rectangle "Application" {
+  ' Gestion des Conteneurs
+  usecase "Gérer les conteneurs" as UC1
+  usecase "Créer un conteneur" as UC2
+  usecase "Modifier un conteneur" as UC3
+  usecase "Supprimer un conteneur" as UC4
+  usecase "Démarrer/Arrêter un conteneur" as UC5
+  usecase "Redémarrer un conteneur" as UC6
+  usecase "Visualiser les logs" as UC7
+  usecase "Visualiser les statistiques" as UC8
+
+  ' Configuration des Conteneurs
+  usecase "Gérer les ports" as UC9
+  usecase "Gérer les volumes" as UC10
+  usecase "Gérer les variables d’environnement" as UC11
+
+  ' Gestion des Images
+  usecase "Lister les images" as UC14
+  usecase "Créer une image" as UC15
+  usecase "Supprimer une image" as UC16
+  usecase "Construire une image personnalisée" as UC17
+
+  ' Gestion des Serveurs
+  usecase "Gérer les serveurs" as UC21
+  usecase "Configurer l’accès SSH" as UC22
+
+  ' Gestion des Utilisateurs (admin only)
+  usecase "Gérer les utilisateurs" as UC23
+
+  ' Relations entre cas d'utilisation
+  UC1 ..> UC2  : <<include>>
+  UC1 ..> UC3  : <<include>>
+  UC1 ..> UC4  : <<include>>
+  UC1 ..> UC5  : <<include>>
+  UC1 ..> UC6  : <<include>>
+  UC1 ..> UC7  : <<include>>
+  UC1 ..> UC8  : <<include>>
+  UC3 ..> UC9  : <<include>>
+  UC3 ..> UC10 : <<include>>
+  UC3 ..> UC11 : <<include>>
+}
+
+' Relations avec les acteurs
+User --> UC1
+User --> UC14
+User --> UC15
+User --> UC16
+User --> UC17
+User --> UC21
+User --> UC22
+
+Admin --> UC23
+@enduml

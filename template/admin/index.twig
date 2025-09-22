@@ -1,0 +1,47 @@
+{% extends 'layout/base.twig' %}
+
+{% block content %}
+ <main> 
+
+    <div id="entete">
+
+        <div id="infosrv">
+
+            <h2>gestion utilisateur</h2> 
+            <a href="/user/add">
+                <button type="button" id="newcont">nouvelle utilisateur <img id="plus" src="assets/img/plus.svg"></button>
+            </a>
+        </div>
+
+        <input id="recherche" type="texte" placeholder="recherche"></input>
+
+    </div>
+
+    {% for user in users %}
+
+        <div class="container">
+
+            <div class="More">
+
+                <div class="info">
+                    <h3>{{user . usernameUsers}}</h3>
+                </div>
+
+                <div class="status">
+                    <img class="miniprofil" src="assets/img/user.png" > 
+                </div>  
+                
+            </div> 
+
+            <div class="boxdetail">
+                <a href="/user/edit">
+                <button class="detail" >détail</button>
+                </a>
+            </div> 
+
+        </div>
+
+    {% endfor %}
+
+</main>
+{% endblock %}

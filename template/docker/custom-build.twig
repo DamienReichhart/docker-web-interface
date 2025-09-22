@@ -1,0 +1,224 @@
+{% extends 'layout/base.twig' %}
+
+{% block title %}Build Custom Docker Image{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mt-4 mb-4">
+                <i class="fas fa-hammer me-2 text-primary"></i>Build Custom Docker Image
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/server">Servers</a></li>
+                    <li class="breadcrumb-item"><a href="/server/manage/{{ server.urlIdentifierServer }}">{{ server.nameServers }}</a></li>
+                    <li class="breadcrumb-item active">Build Custom Image</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-cubes me-2"></i>Build a Custom Image
+                    </h5>
+                    <a href="/dockerfiles" class="btn btn-sm btn-outline-primary">
+                        <i class="fas fa-file-code me-1"></i>Manage Dockerfiles
+                    </a>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <div class="d-flex">
+                            <i class="fas fa-info-circle fa-2x me-3 align-self-center"></i>
+                            <div>
+                                <h5 class="alert-heading">About Custom Builds</h5>
+                                <p class="mb-0">
+                                    Building a custom image will use your selected Dockerfile to create a new Docker image on the server.
+                                    The image will be tagged with the Dockerfile name (without extension).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <form id="build-image-form" action="/dockerfiles/use/{{ server.urlIdentifierServer }}/ajax" method="post" data-no-loading>
+                        <div class="mb-4">
+                            <label for="image" class="form-label">Select Dockerfile</label>
+                            {% if dockerfiles is empty %}
+                                <div class="alert alert-warning mb-3">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    No Dockerfiles available. Please <a href="/dockerfile/add" class="alert-link">create a Dockerfile</a> first.
+                                </div>
+                            {% else %}
+                                <select class="form-select mb-3" id="image" name="image" required>
+                                    <option value="" selected disabled>Select a Dockerfile...</option>
+                                    {% for dockerfile in dockerfiles %}
+                                    <option value="{{ dockerfile }}">{{ dockerfile|replace({'.dockerfile': ''}) }}</option>
+                                    {% endfor %}
+                                </select>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex">
+                            <button type="submit" class="btn btn-primary" {% if dockerfiles is empty %}disabled{% endif %}>
+                                <i class="fas fa-cogs me-1"></i>Build Image
+                            </button>
+                            <a href="/server/manage/{{ server.urlIdentifierServer }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Back to Server
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4" id="operation-result" style="display: none;">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-terminal me-2"></i>Build Status
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="build-status">
+                        <!-- Build status will be displayed here -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6>About Dockerfiles</h6>
+                    <p>
+                        Dockerfiles are text files that contain all the commands needed to build a Docker image. They specify the base image, 
+                        environment setup, files to include, and commands to run.
+                    </p>
+                    
+                    <h6 class="mt-3">Common Dockerfile Instructions</h6>
+                    <ul class="list-group list-group-flush mb-3">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            FROM
+                            <span class="badge bg-primary">Base Image</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            RUN
+                            <span class="badge bg-primary">Execute Commands</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            COPY/ADD
+                            <span class="badge bg-primary">Add Files</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            EXPOSE
+                            <span class="badge bg-primary">Network Ports</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            CMD
+                            <span class="badge bg-primary">Default Command</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/assets/js/docker-image-manager.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get form elements
+        const buildForm = document.getElementById('build-image-form');
+        const resultContainer = document.getElementById('operation-result');
+        const resultContent = resultContainer.querySelector('.build-status');
+        
+        // Handle form submission
+        if (buildForm) {
+            buildForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Show the result container
+                resultContainer.style.display = 'block';
+                resultContent.innerHTML = `
+                    <div class="text-center p-3">
+                        <div class="spinner-border text-primary mb-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mb-0">Building image... This may take a few minutes.</p>
+                    </div>
+                `;
+                
+                // Scroll to results
+                resultContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Get form data
+                const formData = new FormData(buildForm);
+                
+                // Send AJAX request
+                fetch(buildForm.action, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        resultContent.innerHTML = `
+                            <div class="alert alert-success mb-3">
+                                <h5 class="alert-heading"><i class="fas fa-check-circle me-2"></i>Build Successful!</h5>
+                                <p>${data.message}</p>
+                            </div>
+                            <div class="d-grid">
+                                <a href="${data.redirect}" class="btn btn-primary">
+                                    <i class="fas fa-arrow-right me-1"></i>Return to Server Management
+                                </a>
+                            </div>
+                        `;
+                    } else {
+                        resultContent.innerHTML = `
+                            <div class="alert alert-danger mb-3">
+                                <h5 class="alert-heading"><i class="fas fa-exclamation-circle me-2"></i>Build Failed</h5>
+                                <p>${data.message}</p>
+                            </div>
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <i class="fas fa-terminal me-2"></i>Build Output
+                                </div>
+                                <div class="card-body p-0">
+                                    <pre class="mb-0 p-3"><code>${data.command_output || 'No output available'}</code></pre>
+                                </div>
+                            </div>
+                            <div class="d-grid">
+                                <button type="button" class="btn btn-primary" onclick="location.reload()">
+                                    <i class="fas fa-sync-alt me-1"></i>Try Again
+                                </button>
+                            </div>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    resultContent.innerHTML = `
+                        <div class="alert alert-danger mb-3">
+                            <h5 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Error</h5>
+                            <p>A network error occurred: ${error.message}</p>
+                        </div>
+                        <div class="d-grid">
+                            <button type="button" class="btn btn-primary" onclick="location.reload()">
+                                <i class="fas fa-sync-alt me-1"></i>Try Again
+                            </button>
+                        </div>
+                    `;
+                });
+            });
+        }
+    });
+</script>
+{% endblock %} 

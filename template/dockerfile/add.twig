@@ -1,0 +1,189 @@
+{% extends 'layout/base.twig' %}
+
+{% block title %}Add New Dockerfile{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mt-4 mb-4">
+                <i class="fas fa-file-code me-2 text-primary"></i>Create New Dockerfile
+            </h1>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/dockerfiles">Dockerfiles</a></li>
+                    <li class="breadcrumb-item active">Add New</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-plus-circle me-2"></i>Create Dockerfile
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="add-dockerfile-form" action="/dockerfile/add/post" method="post">
+                        <div class="mb-3">
+                            <label for="dockerfileName" class="form-label">Dockerfile Name</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="dockerfileName" name="dockerfileName" 
+                                       placeholder="e.g. web-server, python-app" required
+                                       pattern="[a-zA-Z0-9_-]+" title="Only letters, numbers, hyphens and underscores are allowed">
+                                <span class="input-group-text">.dockerfile</span>
+                            </div>
+                            <div class="form-text">
+                                Enter a name for your Dockerfile. Only use letters, numbers, hyphens and underscores.
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Template (Optional)</label>
+                            <div class="row row-cols-1 row-cols-md-2 g-3">
+                                <div class="col">
+                                    <div class="card h-100 template-select-card" data-template="blank">
+                                        <div class="card-body">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="template" 
+                                                       id="template-blank" value="blank" checked>
+                                                <label class="form-check-label d-block" for="template-blank">
+                                                    <h6 class="mb-1">Blank</h6>
+                                                    <p class="text-muted small mb-0">Start with an empty Dockerfile</p>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="card h-100 template-select-card" data-template="nginx">
+                                        <div class="card-body">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="template" 
+                                                       id="template-nginx" value="nginx">
+                                                <label class="form-check-label d-block" for="template-nginx">
+                                                    <h6 class="mb-1"><i class="fas fa-server me-1 text-info"></i> Nginx</h6>
+                                                    <p class="text-muted small mb-0">Web server configuration</p>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="card h-100 template-select-card" data-template="php">
+                                        <div class="card-body">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="template" 
+                                                       id="template-php" value="php">
+                                                <label class="form-check-label d-block" for="template-php">
+                                                    <h6 class="mb-1"><i class="fab fa-php me-1 text-primary"></i> PHP</h6>
+                                                    <p class="text-muted small mb-0">PHP with Apache</p>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="card h-100 template-select-card" data-template="node">
+                                        <div class="card-body">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="template" 
+                                                       id="template-node" value="node">
+                                                <label class="form-check-label d-block" for="template-node">
+                                                    <h6 class="mb-1"><i class="fab fa-node-js me-1 text-success"></i> Node.js</h6>
+                                                    <p class="text-muted small mb-0">Node.js application</p>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Create Dockerfile
+                            </button>
+                            <a href="/dockerfiles" class="btn btn-outline-secondary ms-2">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <h6>What is a Dockerfile?</h6>
+                    <p>
+                        A Dockerfile is a text document containing commands to assemble a Docker image automatically.
+                    </p>
+                    <p>
+                        After creating your Dockerfile, you can edit it with our built-in editor to customize it for your needs.
+                    </p>
+                    <hr>
+                    <h6>Next Steps</h6>
+                    <ol class="ps-3">
+                        <li>Create your Dockerfile</li>
+                        <li>Edit the contents with our editor</li>
+                        <li>Use it to build a Docker image on your server</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Validate form input
+        const nameInput = document.getElementById('dockerfileName');
+        if (nameInput) {
+            nameInput.addEventListener('input', function() {
+                // Replace any invalid characters
+                this.value = this.value.replace(/[^a-zA-Z0-9_-]/g, '');
+            });
+        }
+        
+        // Make the entire card clickable for template selection
+        const templateCards = document.querySelectorAll('.template-select-card');
+        templateCards.forEach(card => {
+            card.addEventListener('click', function() {
+                // Find the radio button in this card and select it
+                const radio = this.querySelector('input[type="radio"]');
+                if (radio) {
+                    radio.checked = true;
+                    
+                    // Remove active class from all cards
+                    document.querySelectorAll('.template-select-card').forEach(c => {
+                        c.classList.remove('border-primary');
+                    });
+                    
+                    // Add active class to this card
+                    this.classList.add('border-primary');
+                }
+            });
+        });
+        
+        // Set active class on page load for the checked radio
+        document.querySelectorAll('input[name="template"]').forEach(radio => {
+            if (radio.checked) {
+                const card = radio.closest('.template-select-card');
+                if (card) {
+                    card.classList.add('border-primary');
+                }
+            }
+        });
+    });
+</script>
+{% endblock %} 

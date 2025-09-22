@@ -1,0 +1,38 @@
+stages:
+  - build
+  - test
+  - sast
+  - clean
+  - deploy
+
+
+services:
+  - docker:dind
+
+
+tests:
+  image: docker:latest
+  stage: test
+  before_script:
+    - docker version
+    - docker compose version
+  script:
+    - docker compose -f utils.yaml run composer install
+    - docker compose -f utils.yaml run tests
+  only:
+    - dev
+    - main
+
+
+semgrep:
+  image: semgrep/semgrep
+  script: semgrep ci --gitlab-sast > gl-sast-report.json || true
+  stage: sast
+  variables:
+    SEMGREP_APP_TOKEN: $SEMGREP_APP_TOKEN
+  artifacts:
+    reports:
+      sast: gl-sast-report.json
+  only:
+    - dev
+    - main

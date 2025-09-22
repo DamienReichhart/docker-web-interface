@@ -1,0 +1,52 @@
+erDiagram
+    USERS ||--o{ LOGS : "effectue"
+    USERS ||--o{ MANAGE_SERVERS : "gère"
+    ROLES ||--o{ USERS : "possède"
+    ACTIONS_TYPES ||--o{ LOGS : "enregistre"
+    SERVERS ||--o{ MANAGE_SERVERS : "est géré par"
+
+    USERS {
+        int id PK
+        string usernameUsers
+        string emailUsers
+        string passwordUsers
+        int idRoles FK
+    }
+
+    ROLES {
+        int id PK
+        string nameRoles
+    }
+
+    SERVERS {
+        int id PK
+        string nameServers
+        string host
+        string urlIdentifierServer
+        text description
+    }
+
+    MANAGE_SERVERS {
+        int idUsers FK
+        int idServers FK
+        string sshUserManageServers
+        string sshUserPasswordManageServers
+    }
+
+    LOGS {
+        int id PK
+        datetime createdAtLogs
+        int idUsers FK
+        int idActionsTypes FK
+    }
+
+    ACTIONS_TYPES {
+        int id PK
+        string descriptionActionsTypes
+    }
+
+    EMAIL_AUTHENTICATIONS {
+        int id PK
+        string tokenEmailAuthentications
+        datetime createdAtEmailAuthentications
+    }

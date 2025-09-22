@@ -1,0 +1,324 @@
+{
+  "GET" : {
+    "#^/$#": {
+      "controller": "ServerController",
+      "action": "index",
+      "securityLevel": 3
+    },
+    "#^/hello/([0-9]+)$#": {
+      "controller": "helloController",
+      "action": "test",
+      "securityLevel": 1
+    },
+    "#^/login$#": {
+      "controller": "AuthController",
+      "action": "index"
+    },
+    "#^/server$#": {
+      "controller": "ServerController",
+      "action": "index",
+      "securityLevel": 3
+    },
+    "#^/user$#": {
+      "controller": "UserController",
+      "action": "index",
+      "securityLevel": 3
+    },
+    "#^/user/add$#": {
+      "controller": "UserController",
+      "action": "add",
+      "securityLevel": 3
+    },
+    "#^/user/edit$#": {
+      "controller": "UserController",
+      "action": "edit",
+      "securityLevel": 1
+    },
+    "#^/user/edit/([0-9]+)$#": {
+      "controller": "UserController",
+      "action": "edit",
+      "securityLevel": 3
+    },
+    "#^/user/delete/([0-9]+)$#": {
+      "controller": "UserController",
+      "action": "delete",
+      "securityLevel": 3
+    },
+    "#^/admin$#": {
+      "controller": "UserController",
+      "action": "index",
+      "securityLevel": 3
+    },
+    "#^/dockerfile$#": {
+      "controller": "DockerfileController",
+      "action": "index",
+      "securityLevel": 3
+    },
+    "#^/server/add$#": {
+      "controller": "ServerController",
+      "action": "add",
+      "securityLevel": 3
+    },
+    "#^/server/add/access$#": {
+      "controller": "ServerController",
+      "action": "addAccess",
+      "securityLevel": 3
+    },
+    "#^/server/edit/([0-9a-z]+)$#": {
+      "controller": "ServerController",
+      "action": "edit",
+      "securityLevel": 1
+    },
+    "#^/server/delete/([0-9a-z]+)$#": {
+      "controller": "ServerController",
+      "action": "delete",
+      "securityLevel": 1
+    },
+    "#^/server/manage/([0-9a-z]+)$#": {
+      "controller": "ServerController",
+      "action": "manage",
+      "securityLevel": 1
+    },
+    "#^/logout$#": {
+      "controller": "AuthController",
+      "action": "logout"
+    },
+    "#^/test$#": {
+      "controller": "testController",
+      "action": "sshTest",
+      "securityLevel": 1
+    },
+    "#^/container/add/([0-9a-z]+)$#": {
+      "controller": "ContainerController",
+      "action": "add",
+      "securityLevel": 1
+    },
+    "#^/container/delete/([0-9a-z]+)/([0-9a-z]+)$#": {
+      "controller": "ContainerController",
+      "action": "delete",
+      "securityLevel": 1
+    },
+    "#^/container/stop/([0-9a-z]+)/([0-9a-z]+)$#": {
+      "controller": "ContainerController",
+      "action": "delete",
+      "securityLevel": 1
+    },
+    "#^/container/([0-9a-z]+)/([0-9a-z]+)$#": {
+      "controller": "ContainerController",
+      "action": "show",
+      "securityLevel": 1
+    },
+    "#^/container/edit/([0-9a-z]+)/([0-9a-z]+)/command$#": {
+      "controller": "ContainerController",
+      "action": "commandEdit",
+      "securityLevel": 1
+    },
+    "#^/container/add/([0-9a-z]+)/([0-9a-z]+)/ports$#": {
+      "controller": "ContainerController",
+      "action": "portsAdd",
+      "securityLevel": 1
+    },
+    "#^/container/edit/([0-9a-z]+)/([0-9a-z]+)/ports$#": {
+      "controller": "ContainerController",
+      "action": "portsEdit",
+      "securityLevel": 1
+    },
+    "#^/container/delete/([0-9a-z]+)/([0-9a-z]+)/ports$#": {
+      "controller": "ContainerController",
+      "action": "portsDeletePost",
+      "securityLevel": 1
+    },
+    "#^/container/add/([0-9a-z]+)/([0-9a-z]+)/volumes$#": {
+      "controller": "ContainerController",
+      "action": "volumesAdd",
+      "securityLevel": 1
+    },
+    "#^/container/edit/([0-9a-z]+)/([0-9a-z]+)/volumes$#": {
+      "controller": "ContainerController",
+      "action": "volumesEdit",
+      "securityLevel": 1
+    },
+    "#^/container/delete/([0-9a-z]+)/([0-9a-z]+)/volumes$#": {
+      "controller": "ContainerController",
+      "action": "volumesDeletePost",
+      "securityLevel": 1
+    },
+    "#^/container/add/([0-9a-z]+)/([0-9a-z]+)/envs$#": {
+      "controller": "ContainerController",
+      "action": "envsAdd",
+      "securityLevel": 1
+    },
+    "#^/container/edit/([0-9a-z]+)/([0-9a-z]+)/envs$#": {
+      "controller": "ContainerController",
+      "action": "envsEdit",
+      "securityLevel": 1
+    },
+    "#^/container/delete/([0-9a-z]+)/([0-9a-z]+)/envs$#": {
+      "controller": "ContainerController",
+      "action": "envsDelete",
+      "securityLevel": 1
+    },
+    "#^/images/pull/([0-9a-z]+)$#": {
+      "controller": "ImageController",
+      "action": "imagesPull",
+      "securityLevel": 1
+    },
+    "#^/container/start/([0-9a-z]+)/([0-9a-z]+)$#": {
+      "controller": "ContainerController",
+      "action": "startContainer",
+      "securityLevel": 1
+    },
+    "#^/dockerfiles$#": {
+      "controller": "DockerfileController",
+      "action": "index",
+      "securityLevel": 1
+    },
+    "#^/dockerfiles/use/([0-9a-z]+)$#": {
+      "controller": "DockerfileController",
+      "action": "build",
+      "securityLevel": 1
+    },
+    "#^/dockerfile/edit/([0-9a-z_-]+)$#": {
+      "controller": "DockerfileController",
+      "action": "show",
+      "securityLevel": 1
+    },
+    "#^/dockerfile/edit/([0-9a-z_-]+).dockerfile$#": {
+      "controller": "DockerfileController",
+      "action": "show",
+      "securityLevel": 1
+    },
+    "#^/dockerfile/delete/([0-9a-z_-]+)$#": {
+      "controller": "DockerfileController",
+      "action": "delete",
+      "securityLevel": 1
+    },
+    "#^/dockerfile/delete/([0-9a-z_-]+).dockerfile$#": {
+      "controller": "DockerfileController",
+      "action": "delete",
+      "securityLevel": 1
+    },
+    "#^/dockerfile/add$#": {
+      "controller": "DockerfileController",
+      "action": "add",
+      "securityLevel": 1
+    }
+  },
+  "POST" : {
+    "#^/login/post$#": {
+      "controller": "AuthController",
+      "action": "loginPost"
+    },
+    "#^/server/add/post$#": {
+      "controller": "ServerController",
+      "action": "addPost",
+      "securityLevel": 3
+    },
+    "#^/server/access/add/post$#": {
+      "controller": "ServerController",
+      "action": "addAccessPost",
+      "securityLevel": 3
+    },
+    "#^/server/edit/([0-9a-z]+)/post$#": {
+      "controller": "ServerController",
+      "action": "editPost",
+      "securityLevel": 1
+    },
+    "#^/container/add/([0-9a-z]+)/post$#": {
+      "controller": "ContainerController",
+      "action": "addPost",
+      "securityLevel": 1
+    },
+    "#^/container/edit/([0-9a-z]+)/([0-9a-z]+)/command/post$#": {
+      "controller": "ContainerController",
+      "action": "commandEditPost",
+      "securityLevel": 1
+    },
+    "#^/container/add/([0-9a-z]+)/([0-9a-z]+)/ports/post$#": {
+      "controller": "ContainerController",
+      "action": "portsAddPost",
+      "securityLevel": 1
+    },
+    "#^/container/edit/([0-9a-z]+)/([0-9a-z]+)/ports/post$#": {
+      "controller": "ContainerController",
+      "action": "portsEditPost",
+      "securityLevel": 1
+    },
+    "#^/container/delete/([0-9a-z]+)/([0-9a-z]+)/ports$#": {
+      "controller": "ContainerController",
+      "action": "portsDeletePost",
+      "securityLevel": 1
+    },
+    "#^/container/add/([0-9a-z]+)/([0-9a-z]+)/volumes/post$#": {
+      "controller": "ContainerController",
+      "action": "volumesAddPost",
+      "securityLevel": 1
+    },
+    "#^/container/edit/([0-9a-z]+)/([0-9a-z]+)/volumes/post$#": {
+      "controller": "ContainerController",
+      "action": "volumesEditPost",
+      "securityLevel": 1
+    },
+    "#^/container/delete/([0-9a-z]+)/([0-9a-z]+)/volumes$#": {
+      "controller": "ContainerController",
+      "action": "volumesDeletePost",
+      "securityLevel": 1
+    },
+    "#^/container/add/([0-9a-z]+)/([0-9a-z]+)/envs/post$#": {
+      "controller": "ContainerController",
+      "action": "envsAddPost",
+      "securityLevel": 1
+    },
+    "#^/container/edit/([0-9a-z]+)/([0-9a-z]+)/envs/post$#": {
+      "controller": "ContainerController",
+      "action": "envsEditPost",
+      "securityLevel": 1
+    },
+    "#^/container/delete/([0-9a-z]+)/([0-9a-z]+)/envs$#": {
+      "controller": "ContainerController",
+      "action": "envsDeletePost",
+      "securityLevel": 1
+    },
+    "#^/images/pull/([0-9a-z]+)/post$#": {
+      "controller": "ImageController",
+      "action": "imagesPullPost",
+      "securityLevel": 1
+    },
+    "#^/dockerfiles/use/([0-9a-z]+)/post$#": {
+      "controller": "DockerfileController",
+      "action": "buildPost",
+      "securityLevel": 1
+    },
+    "#^/dockerfile/save/([0-9a-z]+).dockerfile$#": {
+      "controller": "DockerfileController",
+      "action": "save",
+      "securityLevel": 1
+    },
+    "#^/dockerfile/add/post$#": {
+      "controller": "DockerfileController",
+      "action": "addPost",
+      "securityLevel": 1
+    },
+    "#^/images/pull/([0-9a-z]+)/ajax$#": {
+      "controller": "ImageController",
+      "action": "imagesPullAjax",
+      "securityLevel": 1
+    },
+    "#^/dockerfiles/use/([0-9a-z]+)/ajax$#": {
+      "controller": "DockerfileController",
+      "action": "buildAjax",
+      "securityLevel": 1
+    },
+    "#^/user/add/post$#": {
+      "controller": "UserController",
+      "action": "addPost",
+      "securityLevel": 3
+    },
+    "#^/user/edit/([0-9]+)/post$#": {
+      "controller": "UserController",
+      "action": "editPost",
+      "securityLevel": 3
+    }
+  }
+}
+

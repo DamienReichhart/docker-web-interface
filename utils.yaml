@@ -1,0 +1,16 @@
+services:
+  tests:
+    build:
+      context: ./docker
+      dockerfile: ./tests.dockerfile
+    volumes:
+      - ./:/var/www/html:ro
+
+
+  composer:
+    build:
+      context: ./docker
+      dockerfile: ./composer.dockerfile
+    volumes:
+      - ./:/var/www/html:rw
+    entrypoint: ['composer', '--ignore-platform-reqs']

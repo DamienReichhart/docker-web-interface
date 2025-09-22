@@ -1,0 +1,174 @@
+/**
+ * Docker Image Manager Styles
+ */
+
+/* Operation result container */
+#operation-result {
+  transition: all 0.3s ease;
+}
+
+#operation-result.loading {
+  border-left: 4px solid #0d6efd;
+}
+
+#operation-result.success {
+  border-left: 4px solid #198754;
+}
+
+#operation-result.error {
+  border-left: 4px solid #dc3545;
+}
+
+/* Custom animations for the loading spinner */
+@keyframes pulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+}
+
+.loading-pulse {
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+/* Command output styling */
+.command-output {
+  max-height: 300px;
+  overflow-y: auto;
+  font-family: 'Courier New', monospace;
+  background-color: #212529 !important;
+  color: #ffffff !important;
+  padding: 1rem;
+  border-radius: 0.25rem;
+  white-space: pre-wrap;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+/* Command output code */
+.command-output pre {
+  margin: 0;
+  color: #ffffff;
+}
+
+.command-output code {
+  color: #ffffff;
+  background-color: transparent;
+  font-family: 'Courier New', monospace;
+}
+
+/* Docker command output styling */
+.command-output br {
+  margin-bottom: 3px;
+  display: block;
+  content: "";
+}
+
+/* Command output sections */
+.command-output .section {
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+/* Improved card for command output */
+.command-output-card {
+  border: none;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.command-output-card .card-header {
+  background-color: #343a40;
+  color: #fff;
+  border-bottom: none;
+}
+
+/* Animation for showing command output */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.command-output.show {
+  animation: fadeInDown 0.3s ease forwards;
+}
+
+/* Toggle button for command output */
+.toggle-output {
+  transition: all 0.2s ease;
+}
+
+.toggle-output:hover {
+  background-color: #f8f9fa;
+}
+
+/* Improved card styling */
+.docker-card {
+  border: none;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  transition: all 0.3s ease;
+}
+
+.docker-card:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.docker-card .card-header {
+  background-color: rgba(13, 110, 253, 0.05);
+  border-bottom: none;
+}
+
+/* Form styling enhancements */
+#pull-image-form .form-control:focus,
+#build-image-form .form-select:focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Image information list */
+.image-info-list .list-group-item {
+  padding: 0.75rem 1.25rem;
+  transition: background-color 0.2s ease;
+}
+
+.image-info-list .list-group-item:hover {
+  background-color: rgba(13, 110, 253, 0.05);
+}
+
+/* Success and error animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.alert {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Mobile responsiveness enhancements */
+@media (max-width: 768px) {
+  .container-fluid {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  .card {
+    margin-bottom: 1rem;
+  }
+} 

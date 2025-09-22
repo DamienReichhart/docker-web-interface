@@ -1,0 +1,44 @@
+sequenceDiagram
+    title PHP Application Data Flow
+    
+    participant DB as Database (MariaDB)
+    participant Model as Model Class
+    participant Controller as Controller
+    participant Twig as Twig Template Engine
+    participant View as View (HTML)
+    participant Client as Client Browser
+    
+    Note over DB, Client: Database to View Data Flow
+    
+    Controller->>Model: Request data
+    
+    Model->>Model: Prepare SQL query
+    Model->>DB: Execute query
+    DB->>Model: Return result set
+    
+    Model->>Model: Create object instances
+    Note over Model: Transform raw data<br/>into domain objects
+    
+    Model->>Controller: Return object collection
+    
+    Controller->>Controller: Process business logic
+    Controller->>Controller: Prepare view data
+    
+    Controller->>Twig: Render template with data
+    
+    Twig->>Twig: Process template logic
+    Twig->>Twig: Format data for display
+    Twig->>Twig: Apply filters and functions
+    Twig->>Twig: Resolve template inheritance
+    
+    Twig->>Controller: Return rendered HTML
+    
+    Controller->>Client: Send HTTP response
+    
+    Note over DB, Model: Data Access Layer
+    Note over Model, Controller: Business Logic Layer
+    Note over Controller, Client: Presentation Layer
+    
+    Note right of Model: ORM Features:<br/>- CRUD operations<br/>- Relationship handling<br/>- Type conversion<br/>- Data validation
+    
+    Note right of Twig: Template Features:<br/>- Layout inheritance<br/>- Custom filters<br/>- Conditional rendering<br/>- Loops & iterators 

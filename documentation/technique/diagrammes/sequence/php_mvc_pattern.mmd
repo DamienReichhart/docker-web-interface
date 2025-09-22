@@ -1,0 +1,44 @@
+sequenceDiagram
+    title MVC Pattern Implementation
+    
+    participant Client as Client
+    participant Router as Router
+    participant Controller as Controller
+    participant View as View (Twig)
+    participant Model as Model
+    participant DB as Database
+    
+    Client->>Router: HTTP Request
+    
+    Router->>Router: Parse request & find route
+    Router->>Controller: Dispatch to appropriate controller
+    
+    Note over Controller: Controller Logic
+    
+    Controller->>Model: Request data
+    
+    Note over Model: Model Logic
+    
+    Model->>Model: Apply business rules
+    Model->>DB: Execute SQL query
+    DB->>Model: Return query results
+    Model->>Model: Process data
+    Model->>Controller: Return processed data
+    
+    Note over Controller, View: View Logic
+    
+    Controller->>Controller: Prepare view data
+    Controller->>View: Render template
+    View->>View: Process template
+    View->>Controller: Return rendered HTML
+    
+    Controller->>Router: Return response
+    Router->>Client: HTTP Response
+    
+    Note over Client, DB: MVC Separation of Concerns
+    
+    Note right of Controller: Controller:<br/>- Handles user input<br/>- Coordinates model & view<br/>- Contains application logic
+    
+    Note right of Model: Model:<br/>- Represents data & business rules<br/>- Provides data access abstraction<br/>- Independent of controller & view
+    
+    Note right of View: View:<br/>- Renders data to user<br/>- Uses Twig templating<br/>- Separated from business logic 

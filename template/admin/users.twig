@@ -1,0 +1,178 @@
+{% extends 'layout/base.twig' %}
+
+{% block title %}{{ page_title }} - Docker Management Portal{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-3">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h2 mb-0">{{ page_title }}</h1>
+        <a href="/user/add" class="btn btn-primary">
+            <i class="fas fa-user-plus me-2"></i>Ajouter un utilisateur
+        </a>
+    </div>
+
+    {% if flash_messages is defined and flash_messages|length > 0 %}
+        {% for message in flash_messages %}
+            <div class="alert alert-{{ message.type }} alert-dismissible fade show" role="alert">
+                {{ message.content }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Search and filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        <input type="text" id="userSearch" class="form-control" placeholder="Rechercher un utilisateur...">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select id="roleFilter" class="form-select">
+                        <option value="">Tous les rôles</option>
+                        <option value="ADMIN">Administrateur</option>
+                        <option value="USER">Utilisateur</option>
+                        <option value="WAITING">En attente</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Users list -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <div class="row align-items-center">
+                <div class="col-md-1">#</div>
+                <div class="col-md-3">Nom d'utilisateur</div>
+                <div class="col-md-3">Email</div>
+                <div class="col-md-2">Rôle</div>
+                <div class="col-md-3">Actions</div>
+            </div>
+        </div>
+        <div class="list-group list-group-flush" id="usersList">
+            {% for user in users %}
+                <div class="list-group-item user-item" data-role="{{ user.idRoles.nameRoles|default('') }}">
+                    <div class="row align-items-center py-2">
+                        <div class="col-md-1">{{ user.id }}</div>
+                        <div class="col-md-3">{{ user.usernameUsers }}</div>
+                        <div class="col-md-3">{{ user.emailUsers }}</div>
+                        <div class="col-md-2">
+                            {% if user.idRoles == 1 %}
+                                <span class="badge bg-danger">Administrateur</span>
+                            {% elseif user.idRoles == 2 %}
+                                <span class="badge bg-success">Utilisateur</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">En attente</span>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-3">
+                            <div class="btn-group" role="group">
+                                <a href="/user/edit/{{ user.id }}" class="btn btn-sm btn-outline-primary" title="Modifier">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-outline-danger delete-user" 
+                                        data-bs-toggle="modal" data-bs-target="#deleteUserModal" 
+                                        data-user-id="{{ user.id }}" 
+                                        data-user-name="{{ user.usernameUsers }}"
+                                        title="Supprimer">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="list-group-item text-center py-4">
+                    <p class="mb-0 text-muted">Aucun utilisateur trouvé</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Pagination if needed -->
+    {% if users|length > 20 %}
+        <nav aria-label="User pagination" class="mt-4">
+            <ul class="pagination justify-content-center">
+                <li class="page-item disabled">
+                    <a class="page-link" href="#" tabindex="-1">Précédent</a>
+                </li>
+                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                <li class="page-item"><a class="page-link" href="#">2</a></li>
+                <li class="page-item"><a class="page-link" href="#">3</a></li>
+                <li class="page-item">
+                    <a class="page-link" href="#">Suivant</a>
+                </li>
+            </ul>
+        </nav>
+    {% endif %}
+</div>
+
+<!-- Delete User Modal -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteUserModalLabel">Confirmer la suppression</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer l'utilisateur <strong id="deleteUserName"></strong>?</p>
+                <p class="text-danger">Cette action est irréversible.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <a href="#" id="confirmDeleteUserBtn" class="btn btn-danger">Supprimer</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Search functionality
+        const userSearch = document.getElementById('userSearch');
+        const roleFilter = document.getElementById('roleFilter');
+        const userItems = document.querySelectorAll('.user-item');
+        
+        function filterUsers() {
+            const searchTerm = userSearch.value.toLowerCase();
+            const roleValue = roleFilter.value;
+            
+            userItems.forEach(item => {
+                const userName = item.querySelector('.col-md-3').textContent.toLowerCase();
+                const userEmail = item.querySelector('.col-md-3:nth-child(2)').textContent.toLowerCase();
+                const userRole = item.dataset.role;
+                
+                const matchesSearch = userName.includes(searchTerm) || userEmail.includes(searchTerm);
+                const matchesRole = roleValue === '' || userRole === roleValue;
+                
+                item.style.display = matchesSearch && matchesRole ? '' : 'none';
+            });
+        }
+        
+        userSearch.addEventListener('input', filterUsers);
+        roleFilter.addEventListener('change', filterUsers);
+        
+        // Delete user modal
+        const deleteUserModal = document.getElementById('deleteUserModal');
+        const deleteUserName = document.getElementById('deleteUserName');
+        const confirmDeleteUserBtn = document.getElementById('confirmDeleteUserBtn');
+        
+        deleteUserModal.addEventListener('show.bs.modal', function(event) {
+            const button = event.relatedTarget;
+            const userId = button.getAttribute('data-user-id');
+            const userName = button.getAttribute('data-user-name');
+            
+            deleteUserName.textContent = userName;
+            confirmDeleteUserBtn.href = '/user/delete/' + userId;
+        });
+    });
+</script>
+{% endblock %} 

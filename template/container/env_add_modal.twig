@@ -1,0 +1,10 @@
+<form id="addEnvForm" action="/container/add/{{ server.urlIdentifierServer }}/{{ container.id }}/envs/post" method="post">
+    <div class="mb-3">
+        <label for="envName" class="form-label">Nom de la variable</label>
+        <input type="text" class="form-control" id="envName" name="envName" required>
+    </div>
+    <div class="mb-3">
+        <label for="envValue" class="form-label">Valeur de la variable</label>
+        <input type="text" class="form-control" id="envValue" name="envValue" required>
+    </div>
+</form> 

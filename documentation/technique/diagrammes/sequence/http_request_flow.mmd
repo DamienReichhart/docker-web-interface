@@ -1,0 +1,34 @@
+sequenceDiagram
+    title HTTP Request Flow Through Docker Infrastructure
+    
+    participant Client as Web Client
+    participant Apache as Apache Container
+    participant PHP as PHP-FPM Container
+    participant DB as MariaDB Container
+    
+    Client->>Apache: HTTP/HTTPS Request
+    
+    Note over Apache: Process request through .htaccess
+    
+    Apache->>Apache: Rewrite request to /public/index.php
+    
+    Apache->>PHP: Forward request via Unix socket
+    
+    Note over PHP: Execute PHP code
+    PHP->>PHP: Initialize application
+    PHP->>PHP: Load environment variables
+    PHP->>PHP: Create session
+    PHP->>PHP: Create HttpRequest
+    PHP->>PHP: Create HttpResponse
+    PHP->>PHP: Initialize Router
+    
+    PHP->>DB: Database queries (if needed)
+    DB->>PHP: Query results
+    
+    PHP->>PHP: Generate response
+    
+    PHP->>Apache: Return response
+    
+    Apache->>Client: HTTP/HTTPS Response
+    
+    Note over Client, DB: End of request lifecycle 
